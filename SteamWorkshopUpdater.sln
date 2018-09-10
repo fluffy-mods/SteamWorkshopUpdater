@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWorkshopUpdater", "SteamWorkshopUpdater.csproj", "{958FC085-885B-4A16-99F7-2D49A2235CA9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cli", "cli.csproj", "{958FC085-885B-4A16-99F7-2D49A2235CA9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lib", "lib\lib.csproj", "{D8A6CFE3-E03F-4521-9885-8C6351B38B38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{958FC085-885B-4A16-99F7-2D49A2235CA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{958FC085-885B-4A16-99F7-2D49A2235CA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{958FC085-885B-4A16-99F7-2D49A2235CA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8A6CFE3-E03F-4521-9885-8C6351B38B38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8A6CFE3-E03F-4521-9885-8C6351B38B38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8A6CFE3-E03F-4521-9885-8C6351B38B38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8A6CFE3-E03F-4521-9885-8C6351B38B38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
