@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LoadingIndicator.cs" />
     <Compile Include="ModHelper.cs" />
     <Compile Include="Uploader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

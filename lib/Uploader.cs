@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using Steamworks;
 
@@ -38,7 +35,7 @@ namespace SteamWorkshopUploader
             }
         }
 
-        public static bool Upload( Mod mod )
+        public static bool Upload( Mod mod, string changenote )
         {
             bool creating = false;
             if ( mod.PublishedFileId == PublishedFileId_t.Invalid )
@@ -53,37 +50,46 @@ namespace SteamWorkshopUploader
                 }
             }
 
+            // create timestamp to force steam to accept the update as a change
+            mod.TimeStamp();
+
             // set up steam API call
             var handle = SteamUGC.StartItemUpdate( RIMWORLD, mod.PublishedFileId );
             SetItemAttributes( handle, mod, creating );
 
             // start async call
-            var call = SteamUGC.SubmitItemUpdate( handle, "changenotes are for the weak" );
+            var call = SteamUGC.SubmitItemUpdate( handle, changenote );
             submitResultCallback = CallResult<SubmitItemUpdateResult_t>.Create( OnItemSubmitted );
             submitResultCallback.Set( call );
 
             // keep checking for async call to complete
+            var loading = new LoadingIndicator();
             while ( !ready.WaitOne( 50 ) )
             {
                 ulong done, total;
                 var status = SteamUGC.GetItemUpdateProgress( handle, out done, out total );
                 SteamAPI.RunCallbacks();
-                Console.WriteLine( status + ": " + done + "/" + total + " completed." );
+                ClearLine();
+                if ( status != EItemUpdateStatus.k_EItemUpdateStatusInvalid )
+                {
+                    if ( total > 0 )
+                        Console.Write( status + ": " + ( done / total ).ToString( "P" ) + " completed. " + loading );
+                    else
+                        Console.Write( status + "... " + loading );
+                }
             }
 
             // we have completed!
             if ( submitResult.m_eResult != EResult.k_EResultOK )
-            {
-                Console.WriteLine( submitResult.m_eResult );
-            }
+                Console.WriteLine( "\n" + submitResult.m_eResult );
+            else
+                Console.WriteLine( "" );
             return submitResult.m_eResult == EResult.k_EResultOK;
         }
 
         private static SubmitItemUpdateResult_t submitResult;
         private static void OnItemSubmitted( SubmitItemUpdateResult_t result, bool failure )
         {
-            Console.WriteLine( "submit callback called:" + result.m_eResult + " :: " + result.m_nPublishedFileId );
-
             // store result and let the main thread continue
             submitResult = result;
             ready.Set();
@@ -97,10 +103,12 @@ namespace SteamWorkshopUploader
             createResultCallback.Set(call);
 
             // keep checking for async call to complete
+            var loading = new LoadingIndicator();
             while (!ready.WaitOne(50))
             {
                 SteamAPI.RunCallbacks();
-                Console.WriteLine( "Waiting for item creation to complete." );
+                ClearLine();
+                Console.Write( "Waiting for item creation to complete... " + loading );
             }
 
             // we have completed!
@@ -111,7 +119,7 @@ namespace SteamWorkshopUploader
             else
             {
                 mod.PublishedFileId = createResult.m_nPublishedFileId;
-                Console.WriteLine( "New mod created (" + mod.PublishedFileId + ")" );
+                Console.WriteLine( "\nNew mod created (" + mod.PublishedFileId + ")" );
             }
             
             return createResult.m_eResult == EResult.k_EResultOK;
@@ -140,6 +148,14 @@ namespace SteamWorkshopUploader
         {
             SteamAPI.Shutdown();
             _initialized = false;
+        }
+
+        private static void ClearLine()
+        {
+            int line = Console.CursorTop;
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, line);
         }
     }
 }

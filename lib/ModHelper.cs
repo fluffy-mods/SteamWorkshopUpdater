@@ -14,7 +14,7 @@ namespace SteamWorkshopUploader
     {
         public string Name { get; }
         public string Preview { get; }
-        public string Description { get; }
+        public string Description { get; set; }
         public List<string> Tags;
 
         private PublishedFileId_t _publishedFileId = PublishedFileId_t.Invalid;
@@ -92,7 +92,7 @@ namespace SteamWorkshopUploader
 
         public override string ToString()
         {
-            return $"Name: {Name}\nPreview: {Preview}\nPublishedFileId: {PublishedFileId}"; // \nDescription: {Description}";
+            return $"Name: {Name}\nPreview: {Preview}\nPublishedFileId: {PublishedFileId}\nDescription: {Description}";
         }
 
         private static string PathCombine( params string[] parts )
@@ -146,6 +146,11 @@ namespace SteamWorkshopUploader
                 }
             }
             return new Version(major, minor, build);
+        }
+
+        public void TimeStamp()
+        {
+            File.WriteAllText( PathCombine( ContentFolder, "About", "timestamp.txt" ), DateTime.Now.ToString() );
         }
     }
 }
