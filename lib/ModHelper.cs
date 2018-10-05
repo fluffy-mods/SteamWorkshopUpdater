@@ -40,7 +40,7 @@ namespace SteamWorkshopUploader
             ContentFolder = path;
             Tags = new List<string>();
 
-            var manifest = PathCombine(path, "Manifest", "Manifest.xml");
+            var manifest = PathCombine(path, "About", "Manifest.xml");
             if (File.Exists(manifest))
             {
                 // open Manifest.xml
