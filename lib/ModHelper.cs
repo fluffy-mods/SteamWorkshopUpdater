@@ -58,8 +58,8 @@ namespace SteamWorkshopUploader
                             {
                                 for ( int k = 0; k < subnode.ChildNodes.Count; k++ )
                                 {
-                                    var tag = subnode.ChildNodes[k];
-                                    Tags.Add(tag.InnerText);
+                                    var li = subnode.ChildNodes[k];
+                                    Tags.Add(li.ChildNodes[0].InnerText);
                                 }
                             }
                         }
