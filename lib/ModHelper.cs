@@ -37,36 +37,66 @@ namespace SteamWorkshopUploader
             {
                 throw new Exception( $"path '{path}' not found." );
             }
-
-            var about = PathCombine( path, "About", "About.xml" );
-            if ( !File.Exists( about ) )
-            {
-                throw new Exception( $"About.xml not found at ({about})");
-            }
-
             ContentFolder = path;
             Tags = new List<string>();
-            Tags.Add( "Mod" );
 
-            // open About.xml
-            var aboutXml = new XmlDocument();
-            aboutXml.Load( about );
-            for ( int i = 0; i < aboutXml.ChildNodes.Count; i++ )
+            var manifest = PathCombine(path, "Manifest", "Manifest.xml");
+            if (File.Exists(manifest))
             {
-                var node = aboutXml.ChildNodes[i];
-                if ( node.Name == "ModMetaData" )
+                // open Manifest.xml
+                var manifestXml = new XmlDocument();
+                manifestXml.Load(manifest);
+                for ( int i = 0; i < manifestXml.ChildNodes.Count; i++ )
                 {
-                    for ( int j = 0; j < node.ChildNodes.Count; j++ )
+                    var node = manifestXml.ChildNodes[i];
+                    if ( node.Name == "Manifest" )
                     {
-                        var meta = node.ChildNodes[j];
-                        if ( meta.Name.ToLower() == "name" )
-                            Name = meta.InnerText;
-                        if ( meta.Name.ToLower() == "description" )
-                            Description = meta.InnerText;
-                        if ( meta.Name.ToLower() == "targetversion" )
+                        for ( int j = 0; j < node.ChildNodes.Count; j++ )
                         {
-                            var version = VersionFromString( meta.InnerText );
-                            Tags.Add( version.Major + "." + version.Minor );
+                            var subnode = node.ChildNodes[j];
+                            if ( subnode.Name.ToLower() == "tags" )
+                            {
+                                for ( int k = 0; k < subnode.ChildNodes.Count; k++ )
+                                {
+                                    var tag = subnode.ChildNodes[k];
+                                    Tags.Add(tag.InnerText);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if ( Tags.Count == 0 )
+            {
+                var about = PathCombine( path, "About", "About.xml" );
+                if ( !File.Exists( about ) )
+                {
+                    throw new Exception( $"About.xml not found at ({about})");
+                }
+
+                Tags.Add( "Mod" );
+
+                // open About.xml
+                var aboutXml = new XmlDocument();
+                aboutXml.Load( about );
+                for ( int i = 0; i < aboutXml.ChildNodes.Count; i++ )
+                {
+                    var node = aboutXml.ChildNodes[i];
+                    if ( node.Name == "ModMetaData" )
+                    {
+                        for ( int j = 0; j < node.ChildNodes.Count; j++ )
+                        {
+                            var meta = node.ChildNodes[j];
+                            if ( meta.Name.ToLower() == "name" )
+                                Name = meta.InnerText;
+                            if ( meta.Name.ToLower() == "description" )
+                                Description = meta.InnerText;
+                            if ( meta.Name.ToLower() == "targetversion" )
+                            {
+                                var version = VersionFromString( meta.InnerText );
+                                Tags.Add( version.Major + "." + version.Minor );
+                            }
                         }
                     }
                 }
