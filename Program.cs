@@ -56,8 +56,7 @@ Options:
                 Uploader.Init();
                 if ( Uploader.Upload( mod, changenote ) )
                 {
-                    Console.WriteLine( "Upload done: https://steamcommunity.com/sharedfiles/filedetails/changelog/" +
-                                       mod.PublishedFileId );
+                    Console.WriteLine( "Upload done: https://steamcommunity.com/sharedfiles/filedetails/changelog/" + mod.PublishedFileId );
                 }
                 else
                 {

@@ -39,11 +39,13 @@ namespace SteamWorkshopUploader
             }
             ContentFolder = path;
             Tags = new List<string>();
+            Tags.Add("Mod");
 
+
+            // open Manifest.xml to look for any extra targetVersions.
             var manifest = PathCombine(path, "About", "Manifest.xml");
             if (File.Exists(manifest))
             {
-                // open Manifest.xml
                 var manifestXml = new XmlDocument();
                 manifestXml.Load(manifest);
                 for ( int i = 0; i < manifestXml.ChildNodes.Count; i++ )
@@ -54,49 +56,52 @@ namespace SteamWorkshopUploader
                         for ( int j = 0; j < node.ChildNodes.Count; j++ )
                         {
                             var subnode = node.ChildNodes[j];
-                            if ( subnode.Name.ToLower() == "tags" )
+                            if ( subnode.Name.ToLower() == "targetVersions" )
                             {
                                 for ( int k = 0; k < subnode.ChildNodes.Count; k++ )
                                 {
                                     var li = subnode.ChildNodes[k];
-                                    Tags.Add(li.ChildNodes[0].InnerText);
+                                    try
+                                    {
+                                        var version = VersionFromString( li.InnerText );
+                                        Tags.Add( version.Major + "." + version.Minor );
+                                    }
+                                    catch ( Exception e )
+                                    {
+                                        Console.WriteLine(
+                                            $"Error reading targetVersions from Manifest.xml ({li.InnerText}): {e.Message}" );
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-            
-            if ( Tags.Count == 0 )
+
+            // open About.xml
+            var about = PathCombine( path, "About", "About.xml" );
+            if ( !File.Exists( about ) )
             {
-                var about = PathCombine( path, "About", "About.xml" );
-                if ( !File.Exists( about ) )
+                throw new Exception( $"About.xml not found at ({about})");
+            }
+            var aboutXml = new XmlDocument();
+            aboutXml.Load( about );
+            for ( int i = 0; i < aboutXml.ChildNodes.Count; i++ )
+            {
+                var node = aboutXml.ChildNodes[i];
+                if ( node.Name == "ModMetaData" )
                 {
-                    throw new Exception( $"About.xml not found at ({about})");
-                }
-
-                Tags.Add( "Mod" );
-
-                // open About.xml
-                var aboutXml = new XmlDocument();
-                aboutXml.Load( about );
-                for ( int i = 0; i < aboutXml.ChildNodes.Count; i++ )
-                {
-                    var node = aboutXml.ChildNodes[i];
-                    if ( node.Name == "ModMetaData" )
+                    for ( int j = 0; j < node.ChildNodes.Count; j++ )
                     {
-                        for ( int j = 0; j < node.ChildNodes.Count; j++ )
+                        var meta = node.ChildNodes[j];
+                        if ( meta.Name.ToLower() == "name" )
+                            Name = meta.InnerText;
+                        if ( meta.Name.ToLower() == "description" )
+                            Description = meta.InnerText;
+                        if ( meta.Name.ToLower() == "targetversion" && Tags.Count == 1 )
                         {
-                            var meta = node.ChildNodes[j];
-                            if ( meta.Name.ToLower() == "name" )
-                                Name = meta.InnerText;
-                            if ( meta.Name.ToLower() == "description" )
-                                Description = meta.InnerText;
-                            if ( meta.Name.ToLower() == "targetversion" )
-                            {
-                                var version = VersionFromString( meta.InnerText );
-                                Tags.Add( version.Major + "." + version.Minor );
-                            }
+                            var version = VersionFromString( meta.InnerText );
+                            Tags.Add( version.Major + "." + version.Minor );
                         }
                     }
                 }

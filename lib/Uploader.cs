@@ -137,6 +137,7 @@ namespace SteamWorkshopUploader
         {
             SteamUGC.SetItemTitle( handle, mod.Name );
             SteamUGC.SetItemTags( handle, mod.Tags );
+            SteamUGC.SetItemDescription( handle, mod.Description );
             SteamUGC.SetItemContent( handle, mod.ContentFolder );
             if ( mod.Preview != null )
                 SteamUGC.SetItemPreview( handle, mod.Preview );
