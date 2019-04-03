@@ -66,8 +66,7 @@ namespace SteamWorkshopUploader
             var loading = new LoadingIndicator();
             while ( !ready.WaitOne( 50 ) )
             {
-                ulong done, total;
-                var status = SteamUGC.GetItemUpdateProgress( handle, out done, out total );
+                var status = SteamUGC.GetItemUpdateProgress( handle, out ulong done, out ulong total );
                 SteamAPI.RunCallbacks();
                 ClearLine();
                 if ( status != EItemUpdateStatus.k_EItemUpdateStatusInvalid )
@@ -137,14 +136,16 @@ namespace SteamWorkshopUploader
         {
             SteamUGC.SetItemTitle( handle, mod.Name );
             SteamUGC.SetItemTags( handle, mod.Tags );
-            SteamUGC.SetItemDescription( handle, mod.Description );
             SteamUGC.SetItemContent( handle, mod.ContentFolder );
+
+            //If uploading as a contributor, comment out the following lines:
+            SteamUGC.SetItemDescription( handle, mod.Description );
             if ( mod.Preview != null )
                 SteamUGC.SetItemPreview( handle, mod.Preview );
             if ( creating )
                 SteamUGC.SetItemVisibility( handle, ERemoteStoragePublishedFileVisibility.k_ERemoteStoragePublishedFileVisibilityPrivate );
         }
-        
+
         public static void Shutdown()
         {
             SteamAPI.Shutdown();

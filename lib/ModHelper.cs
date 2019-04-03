@@ -98,7 +98,7 @@ namespace SteamWorkshopUploader
                             Name = meta.InnerText;
                         if ( meta.Name.ToLower() == "description" )
                             Description = meta.InnerText;
-                        if ( meta.Name.ToLower() == "targetversion" && Tags.Count == 1 )
+                        if ( meta.Name.ToLower() == "supportedversions" && Tags.Count == 1 )
                         {
                             var version = VersionFromString( meta.InnerText );
                             Tags.Add( version.Major + "." + version.Minor );
@@ -140,37 +140,28 @@ namespace SteamWorkshopUploader
         {
             if ( string.IsNullOrEmpty( str ) )
             {
-                throw new ArgumentException("str");
+                throw new ArgumentException("version empty");
             }
             string[] array = str.Split( '.' );
-            if (array.Length > 3)
+            if (array.Length > 2)
             {
-                throw new ArgumentException("str");
+                throw new ArgumentException("version more than 2 elements. What is this, B19?");
             }
             int major = 0;
             int minor = 0;
-            int build = 0;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < array.Length; i++)
             {
-                int num;
-                if (!int.TryParse(array[i], out num))
+                if (!int.TryParse(array[i], out int num))
                 {
-                    throw new ArgumentException("str");
+                    throw new ArgumentException($"can't parse {i} of version {str}");
                 }
                 if (num < 0)
                 {
-                    throw new ArgumentException("str");
+                    throw new ArgumentException($"part of version {str} less than zero");
                 }
                 if (i != 0)
                 {
-                    if (i != 1)
-                    {
-                        if (i == 2)
-                        {
-                            build = num;
-                        }
-                    }
-                    else
+                    if (i == 1)
                     {
                         minor = num;
                     }
@@ -180,7 +171,7 @@ namespace SteamWorkshopUploader
                     major = num;
                 }
             }
-            return new Version(major, minor, build);
+            return new Version(major, minor);
         }
 
         public void TimeStamp()
