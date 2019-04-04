@@ -15,6 +15,7 @@ namespace SteamWorkshopUploader
         public string Name { get; }
         public string Preview { get; }
         public string Description { get; set; }
+        public bool OriginalUploader { get; set; }
         public List<string> Tags;
 
         private PublishedFileId_t _publishedFileId = PublishedFileId_t.Invalid;
@@ -31,12 +32,13 @@ namespace SteamWorkshopUploader
 
         public string ContentFolder { get; }
 
-        public Mod ( string path )
+        public Mod ( string path, bool originalUploader = true )
         {
             if ( !Directory.Exists( path ) )
             {
                 throw new Exception( $"path '{path}' not found." );
             }
+            OriginalUploader = originalUploader;
             ContentFolder = path;
             Tags = new List<string>();
             Tags.Add("Mod");

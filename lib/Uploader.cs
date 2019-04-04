@@ -138,12 +138,15 @@ namespace SteamWorkshopUploader
             SteamUGC.SetItemTags( handle, mod.Tags );
             SteamUGC.SetItemContent( handle, mod.ContentFolder );
 
-            //If uploading as a contributor, comment out the following lines:
-            SteamUGC.SetItemDescription( handle, mod.Description );
-            if ( mod.Preview != null )
-                SteamUGC.SetItemPreview( handle, mod.Preview );
-            if ( creating )
-                SteamUGC.SetItemVisibility( handle, ERemoteStoragePublishedFileVisibility.k_ERemoteStoragePublishedFileVisibilityPrivate );
+            if (!mod.OriginalUploader)
+                return;
+
+            //only the original uploader (i.e. not contributors) can do the following operations
+            SteamUGC.SetItemDescription(handle, mod.Description);
+            if (mod.Preview != null)
+                SteamUGC.SetItemPreview(handle, mod.Preview);
+            if (creating)
+                SteamUGC.SetItemVisibility(handle, ERemoteStoragePublishedFileVisibility.k_ERemoteStoragePublishedFileVisibilityPrivate);
         }
 
         public static void Shutdown()
