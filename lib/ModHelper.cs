@@ -58,7 +58,7 @@ namespace SteamWorkshopUploader
                         for ( int j = 0; j < node.ChildNodes.Count; j++ )
                         {
                             var subnode = node.ChildNodes[j];
-                            if ( subnode.Name.ToLower() == "targetVersions" )
+                            if ( subnode.Name.ToLower() == "targetversions" )
                             {
                                 for ( int k = 0; k < subnode.ChildNodes.Count; k++ )
                                 {
@@ -102,8 +102,11 @@ namespace SteamWorkshopUploader
                             Description = meta.InnerText;
                         if ( meta.Name.ToLower() == "supportedversions" && Tags.Count == 1 )
                         {
-                            var version = VersionFromString( meta.InnerText );
-                            Tags.Add( version.Major + "." + version.Minor );
+                            for ( int k = 0; k < meta.ChildNodes.Count; k++ )
+                            {
+                                var version = VersionFromString( meta.ChildNodes[k].InnerText );
+                                Tags.Add( version.Major + "." + version.Minor );
+                            }
                         }
                     }
                 }
